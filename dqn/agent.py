@@ -1,12 +1,14 @@
 import numpy as np
 
+from dqn.memory import ReplayMemory
+
 
 class DQNAgent:
     """
     The DQN Agent
     """
 
-    def __init__(self, env, memory, net, epsilon_init: float = 1):
+    def __init__(self, env, memory: ReplayMemory, net, epsilon_init: float = 1):
         """
         The initialization method of our agent
         :param env: gym environment
@@ -30,4 +32,7 @@ class DQNAgent:
         return np.argmax(self.net.predict(state))
 
     def replay(self, batch_size: int):
+        x, y = [], []  # x: the input state vector, y: the target state vector
+        experiences = self.memory.get_batch(batch_size)
         
+
