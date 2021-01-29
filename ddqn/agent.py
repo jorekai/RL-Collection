@@ -1,5 +1,5 @@
 import math
-from copy import deepcopy
+from copy import copy
 
 import numpy as np
 
@@ -30,7 +30,7 @@ class DDQNAgent:
         self.env = env
         self.memory = memory
         self.net = net
-        self.target_network = deepcopy(net)
+        self.target_network = copy(net)  # <---- new to ddqn, initialize by copying the net
         # hyperparameters
         self.epsilon = epsilon_init
         self.epsilon_min = epsilon_min
@@ -58,10 +58,12 @@ class DDQNAgent:
 
         for state, action, reward, next_state, done in experiences:
             target = self.net.predict(state)
-            target[0][action] = reward if done else reward + self.gamma * np.max(self.net.predict(next_state)[0])
+            # new to ddqn, we get the maximum state,action value from our target network
+            target[0][action] = reward if done else reward + self.gamma * np.max(self.target_network.predict(next_state)[0])
             x.append(state[0])
             y.append(target[0])
         self.net.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0)
+        self.update_target_model()
 
     def decay_epsilon(self, step: int):
         """

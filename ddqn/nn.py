@@ -45,7 +45,7 @@ class NN:
         """
         return self.model.fit(*args, **kwargs)
 
-    def get_weights(self, *args, **kwargs):
+    def get_weights(self):
         """
         Passing the arguments to keras get_weights
         """

@@ -3,12 +3,13 @@ from collections import namedtuple
 import gym
 import numpy as np
 import tensorflow as tf
+
 # we define a experience tuple for easy convention of MDP notation
 # sometimes in literature people use the equivalent word observation for state
 # state == observation
-from dqn.agent import DQNAgent
-from dqn.memory import ReplayMemory
-from dqn.nn import NN
+from ddqn.agent import DDQNAgent
+from ddqn.memory import ReplayMemory
+from ddqn.nn import NN
 
 Experience = namedtuple("Experience", "state action reward next_state done")
 
@@ -26,9 +27,9 @@ if __name__ == '__main__':
     max_env_steps = 1000
 
     env = gym.make('CartPole-v0')
-    agent = DQNAgent(env=env,
-                     net=NN(alpha=0.001, decay=0.0001),
-                     memory=ReplayMemory(size=100000))
+    agent = DDQNAgent(env=env,
+                      net=NN(alpha=0.001, decay=0.0001),
+                      memory=ReplayMemory(size=100000))
 
     if max_env_steps is not None:
         env._max_episode_steps = max_env_steps
@@ -52,4 +53,4 @@ if __name__ == '__main__':
         agent.decay_epsilon(e)
         if score > max_score:
             max_score = score
-            print(f"Score in episode: {e} is: {score} --- eps: {agent.epsilon }")
+            print(f"Score in episode: {e} is: {score} --- eps: {agent.epsilon}")
