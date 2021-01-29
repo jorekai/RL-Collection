@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 
 import numpy as np
 
@@ -6,9 +7,9 @@ from dqn.memory import ReplayMemory
 from dqn.nn import NN
 
 
-class DQNAgent:
+class DDQNAgent:
     """
-    The DQN Agent
+    The DDQN Agent, notice the difference to DQN lies in the target network
     """
 
     def __init__(self,
@@ -29,6 +30,7 @@ class DQNAgent:
         self.env = env
         self.memory = memory
         self.net = net
+        self.target_network = deepcopy(net)
         # hyperparameters
         self.epsilon = epsilon_init
         self.epsilon_min = epsilon_min
@@ -69,3 +71,10 @@ class DQNAgent:
         """
         if self.epsilon > self.epsilon_min:
             self.epsilon = max(self.epsilon_min, min(self.epsilon, 1.0 - math.log10((step + 1) * self.epsilon_decay)))
+
+    def update_target_model(self):
+        """
+        This method is new to DDQN, just update the weights every n-th step
+        :return: void
+        """
+        self.target_network.set_weights(self.net.get_weights())
