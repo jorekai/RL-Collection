@@ -1,7 +1,5 @@
 from collections import deque
-from random import random
-
-from run import Experience
+import random
 
 
 class ReplayMemory:
@@ -12,7 +10,7 @@ class ReplayMemory:
         """
         self.memory = deque(maxlen=size)
 
-    def append(self, experience: Experience):
+    def append(self, experience):
         """
         Append a experience tuple to our memory object
         :param experience: Tuple(state, action, reward, next_state, done)

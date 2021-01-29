@@ -1,4 +1,5 @@
-from tensorflow.keras import Sequential, Dense
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense
 from tensorflow.python.keras.optimizer_v1 import adam
 
 
