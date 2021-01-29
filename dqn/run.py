@@ -23,10 +23,7 @@ if __name__ == '__main__':
     max_score = 0
 
     n_episodes = 5000
-    n_win_tick = 1000
     max_env_steps = 1000
-    monitor = False
-    quiet = False
 
     env = gym.make('CartPole-v0')
     agent = DQNAgent(env=env,
