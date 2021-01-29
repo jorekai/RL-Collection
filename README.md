@@ -1,4 +1,5 @@
 # RL-Collection
+This repository aims to clearly implement RL algorithms with easy to understand implementation.
 
 ## Deep Q-Network (DQN)
 The implementation of a standard DQN algorithm running on the openai gym cartpole environment.
