@@ -4,12 +4,12 @@ import gym
 import numpy as np
 import tensorflow as tf
 
+from duelling_ddqn.agent import DuellingDDQNAgent
 # we define a experience tuple for easy convention of MDP notation
 # sometimes in literature people use the equivalent word observation for state
 # state == observation
-from ddqn.agent import DDQNAgent
-from ddqn.memory import ReplayMemory
-from ddqn.nn import NN
+from duelling_ddqn.memory import ReplayMemory
+from duelling_ddqn.nn import NN
 
 Experience = namedtuple("Experience", "state action reward next_state done")
 
@@ -27,10 +27,10 @@ if __name__ == '__main__':
     max_env_steps = 1000
 
     env = gym.make('CartPole-v0')
-    agent = DDQNAgent(env=env,
-                      net=NN(alpha=0.001, decay=0.0001),
-                      target_net=NN(alpha=0.001, decay=0.0001),
-                      memory=ReplayMemory(size=100000))
+    agent = DuellingDDQNAgent(env=env,
+                              net=NN(env=env),
+                              target_net=NN(env=env),
+                              memory=ReplayMemory(size=100000))
 
     if max_env_steps is not None:
         env._max_episode_steps = max_env_steps

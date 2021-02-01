@@ -2,13 +2,13 @@ import math
 
 import numpy as np
 
-from ddqn.memory import ReplayMemory
-from ddqn.nn import NN
+from ddqn_per_polyak.memory import ReplayMemory
+from ddqn_per_polyak.nn import NN
 
 
-class DDQNAgent:
+class PolyakAgent:
     """
-    The DDQN Agent, notice the difference to DQN lies in the target network
+    The PolyakAgent Agent, notice the difference to DQN lies in the target network
     """
 
     def __init__(self,
@@ -19,7 +19,8 @@ class DDQNAgent:
                  epsilon_init: float = 1,
                  gamma: float = 0.99,
                  epsilon_min: float = 0.01,
-                 epsilon_decay: float = 0.999):
+                 epsilon_decay: float = 0.05,
+                 tau: float = 0.8):
         """
         The initialization method of our agent
         :param env: gym environment
@@ -36,6 +37,7 @@ class DDQNAgent:
         self.epsilon_min = epsilon_min
         self.epsilon_decay = epsilon_decay
         self.gamma = gamma
+        self.tau = tau
 
     def act(self, state):
         """
@@ -64,7 +66,7 @@ class DDQNAgent:
             x.append(state[0])
             y.append(target[0])
         self.net.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0)
-        self.update_target_model()
+        self.update_target_model(self.tau)
 
     def decay_epsilon(self, step: int):
         """
@@ -75,9 +77,22 @@ class DDQNAgent:
         if self.epsilon > self.epsilon_min:
             self.epsilon = max(self.epsilon_min, min(self.epsilon, 1.0 - math.log10((step + 1) * self.epsilon_decay)))
 
-    def update_target_model(self):
+    def update_target_model(self, tau: float):
         """
-        This method is new to DDQN, just update the weights every n-th step
+        The polyak update method supports a tau argument to fine tune the update value
+        :type tau: float value for update strength
         :return: void
         """
-        self.target_network.set_weights(self.net.get_weights())
+        local_weights = self.net.get_weights()
+        target_weights = self.target_network.get_weights()
+        polyak_weights = [tau * lw + ((1 - tau) * tw) for lw, tw in zip(local_weights, target_weights)]
+        self.target_network.set_weights(polyak_weights)
+
+    def get_error(self, transition):
+        state, action, reward, next_state, done = transition
+        target = self.net.predict(state)
+        target_old = np.array(target)
+        # new to ddqn, we get the maximum state,action value from our target network
+        target[0][action] = reward if done else reward + self.gamma * np.max(self.target_network.predict(next_state)[0])
+        td_error = np.abs(target[0][action] - target_old[0][action])
+        return td_error

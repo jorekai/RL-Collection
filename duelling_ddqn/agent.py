@@ -1,14 +1,15 @@
 import math
+from copy import copy
 
 import numpy as np
 
-from ddqn.memory import ReplayMemory
-from ddqn.nn import NN
+from duelling_ddqn.memory import ReplayMemory
+from duelling_ddqn.nn import NN
 
 
-class DDQNAgent:
+class DuellingDDQNAgent:
     """
-    The DDQN Agent, notice the difference to DQN lies in the target network
+    The DuellingDDQNAgent Agent, notice the difference to DQN lies in the target network
     """
 
     def __init__(self,
@@ -19,7 +20,7 @@ class DDQNAgent:
                  epsilon_init: float = 1,
                  gamma: float = 0.99,
                  epsilon_min: float = 0.01,
-                 epsilon_decay: float = 0.999):
+                 epsilon_decay: float = 0.2):
         """
         The initialization method of our agent
         :param env: gym environment
@@ -30,7 +31,7 @@ class DDQNAgent:
         self.env = env
         self.memory = memory
         self.net = net
-        self.target_network = target_net  # <---- new to ddqn, initialize
+        self.target_network = target_net  # <---- new to ddqn, initialize by copying the net
         # hyperparameters
         self.epsilon = epsilon_init
         self.epsilon_min = epsilon_min
@@ -59,8 +60,7 @@ class DDQNAgent:
         for state, action, reward, next_state, done in experiences:
             target = self.net.predict(state)
             # new to ddqn, we get the maximum state,action value from our target network
-            target[0][action] = reward if done else reward + self.gamma * np.max(
-                self.target_network.predict(next_state)[0])
+            target[0][action] = reward if done else reward + self.gamma * np.max(self.target_network.predict(next_state)[0])
             x.append(state[0])
             y.append(target[0])
         self.net.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0)

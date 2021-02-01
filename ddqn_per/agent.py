@@ -2,13 +2,13 @@ import math
 
 import numpy as np
 
-from ddqn.memory import ReplayMemory
-from ddqn.nn import NN
+from ddqn_per.memory import ReplayMemory
+from ddqn_per.nn import NN
 
 
-class DDQNAgent:
+class DDQNPERAgent:
     """
-    The DDQN Agent, notice the difference to DQN lies in the target network
+    The DDQNPERAgent Agent, notice the difference to DQN lies in the target network
     """
 
     def __init__(self,
@@ -30,7 +30,7 @@ class DDQNAgent:
         self.env = env
         self.memory = memory
         self.net = net
-        self.target_network = target_net  # <---- new to ddqn, initialize
+        self.target_network = target_net  # <---- new to ddqn, initialize target
         # hyperparameters
         self.epsilon = epsilon_init
         self.epsilon_min = epsilon_min
@@ -81,3 +81,12 @@ class DDQNAgent:
         :return: void
         """
         self.target_network.set_weights(self.net.get_weights())
+
+    def get_error(self, transition):
+        state, action, reward, next_state, done = transition
+        target = self.net.predict(state)
+        target_old = np.array(target)
+        # new to ddqn, we get the maximum state,action value from our target network
+        target[0][action] = reward if done else reward + self.gamma * np.max(self.target_network.predict(next_state)[0])
+        td_error = np.abs(target[0][action] - target_old[0][action])
+        return td_error
