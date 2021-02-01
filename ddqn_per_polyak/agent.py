@@ -85,6 +85,7 @@ class PolyakAgent:
         """
         local_weights = self.net.get_weights()
         target_weights = self.target_network.get_weights()
+        # polyak update means to scale down the update factor of our weights
         polyak_weights = [tau * lw + ((1 - tau) * tw) for lw, tw in zip(local_weights, target_weights)]
         self.target_network.set_weights(polyak_weights)
 
