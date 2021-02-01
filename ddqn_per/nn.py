@@ -6,8 +6,6 @@ from tensorflow.python.keras.optimizer_v1 import adam
 class NN:
     """
     The NN class wraps a keras Sequential model to reduce the interface methods
-    Notice:
-        Difference to dqn is just the setter and getter methods for the weights
     """
     def __init__(self, alpha: float, decay: float):
         self.alpha = alpha

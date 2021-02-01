@@ -8,7 +8,7 @@ from ddqn_per.nn import NN
 
 class DDQNPERAgent:
     """
-    The DDQNPERAgent Agent, notice the difference to DQN lies in the target network
+    The DDQNPERAgent Agent, notice the difference to DDQN lies in the use of a heap structure memory
     """
 
     def __init__(self,
@@ -21,11 +21,15 @@ class DDQNPERAgent:
                  epsilon_min: float = 0.01,
                  epsilon_decay: float = 0.999):
         """
-        The initialization method of our agent
+        We initialize necessary objects and hyperparams
         :param env: gym environment
-        :param memory: replay memory of any size
-        :param net: neural network model of any size
-        :param epsilon_init: float value for exploration initialisation
+        :param memory: a replay memory buffer
+        :param net: local network
+        :param target_net: target network
+        :param epsilon_init: initial exploration factor
+        :param gamma: the discount for future q-values
+        :param epsilon_min: the exploration factor to stop at
+        :param epsilon_decay: a decay factor (0,1)
         """
         self.env = env
         self.memory = memory
@@ -83,10 +87,14 @@ class DDQNPERAgent:
         self.target_network.set_weights(self.net.get_weights())
 
     def get_error(self, transition):
+        """
+        Compute the temporal difference Error for a transition tuple
+        :param transition: S,A,R,S',D
+        :return: error scalar
+        """
         state, action, reward, next_state, done = transition
         target = self.net.predict(state)
         target_old = np.array(target)
-        # new to ddqn, we get the maximum state,action value from our target network
         target[0][action] = reward if done else reward + self.gamma * np.max(self.target_network.predict(next_state)[0])
         td_error = np.abs(target[0][action] - target_old[0][action])
         return td_error
