@@ -8,7 +8,7 @@ from ddqn.nn import NN
 
 class DDQNAgent:
     """
-    The DDQN Agent, notice the difference to DQN lies in the target network
+    The DDQN Agent, notice the difference to DQN lies in the use of a target network
     """
 
     def __init__(self,
@@ -21,11 +21,15 @@ class DDQNAgent:
                  epsilon_min: float = 0.01,
                  epsilon_decay: float = 0.999):
         """
-        The initialization method of our agent
+        We initialize necessary objects and hyperparams
         :param env: gym environment
-        :param memory: replay memory of any size
-        :param net: neural network model of any size
-        :param epsilon_init: float value for exploration initialisation
+        :param memory: a replay memory buffer
+        :param net: local network
+        :param target_net: target network
+        :param epsilon_init: initial exploration factor
+        :param gamma: the discount for future q-values
+        :param epsilon_min: the exploration factor to stop at
+        :param epsilon_decay: a decay factor (0,1)
         """
         self.env = env
         self.memory = memory

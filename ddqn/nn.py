@@ -10,6 +10,11 @@ class NN:
         Difference to dqn is just the setter and getter methods for the weights
     """
     def __init__(self, alpha: float, decay: float):
+        """
+        Initialize a keras model with hyperparams
+        :param alpha: learning factor
+        :param decay: learning decay factor
+        """
         self.alpha = alpha
         self.decay = decay
         self.model = self.init_model()
