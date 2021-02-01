@@ -1,5 +1,6 @@
 # RL-Collection
 This repository aims to clearly implement RL algorithms with easy to understand implementation.
+Also take a look here: https://github.com/LinxiFan/RL-Pseudocode
 
 ## Deep Q-Network (DQN)
 
@@ -22,3 +23,11 @@ Original Paper: https://arxiv.org/pdf/1511.05952.pdf
 ## DDQN-PER Polyak Update (DDQN-PER-POLYAK)
 
 Didn't find a real paper but some good read: https://towardsdatascience.com/double-deep-q-networks-905dd8325412
+
+## Distributional DDQN (C51-DQN)
+
+TBD
+
+## Rainbow DQN (Rainbow-DQN)
+
+TBD
