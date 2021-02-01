@@ -44,7 +44,7 @@ if __name__ == '__main__':
         while not done:
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
-            # env.render()
+            env.render()
             next_state = reshape(next_state)
             agent.memory.append(Experience(state, action, reward, next_state, done))
             state = next_state
