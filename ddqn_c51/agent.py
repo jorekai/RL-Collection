@@ -70,11 +70,34 @@ class C51Agent:
         :param batch_size: int > 0
         :return: void
         """
-        x, y = [], []  # x: the input state vector, y: the target state vector
-        experiences = self.memory.get_batch(batch_size)
-        s, a, r, s_, d = [], [], [] ,[] ,[]
-        for state, action, reward, next_states, done in experiences:
-            s_.append(self.net.predict(next_states))
+        states, actions, rewards, next_states, dones = zip(*self.memory.get_batch(batch_size))
+        z = self.net.predict(next_states)
+        z_ = self.target_network.predict(next_states)
+        z_concat = np.vstack(z)
+        q = np.sum(np.multiply(z_concat, np.array(self.distribution)), axis=1)
+        print(q)
+        q = q.reshape((batch_size, self.env.action_space.n), order='F')
+        next_actions = np.argmax(q, axis=1)
+        m_prob = [np.zeros((batch_size, self.atoms))
+                  for _ in range(self.env.action_space.n)]
+        for i in range(batch_size):
+            if dones[i]:
+                Tz = min(self.reward_max, max(self.reward_min, rewards[i]))
+                bj = (Tz - self.reward_min) / self.delta_z
+                l, u = math.floor(bj), math.ceil(bj)
+                m_prob[actions[i]][i][int(l)] += (u - bj)
+                m_prob[actions[i]][i][int(u)] += (bj - l)
+            else:
+                for j in range(self.atoms):
+                    Tz = min(self.reward_max, max(
+                        self.reward_min, rewards[i] + self.gamma * self.distribution[j]))
+                    bj = (Tz - self.reward_min) / self.delta_z
+                    l, u = math.floor(bj), math.ceil(bj)
+                    m_prob[actions[i]][i][int(
+                        l)] += z_[next_actions[i]][i][j] * (u - bj)
+                    m_prob[actions[i]][i][int(
+                        u)] += z_[next_actions[i]][i][j] * (bj - l)
+        self.net.fit(states, m_prob)
 
     def decay_epsilon(self, step: int):
         """
