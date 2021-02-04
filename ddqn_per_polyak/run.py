@@ -44,17 +44,15 @@ if __name__ == '__main__':
         while not done:
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
-            env.render()
+            # env.render()
             next_state = reshape(next_state)
-            transition = Experience(state, action, reward, next_state, done)
-            td_error = agent.get_error(transition)
-            agent.memory.append(transition, td_error)
+            agent.memory.append(Experience(state, action, reward, next_state, done))
             state = next_state
             score += 1
-        # replay experience and decay exploration factor
-        agent.replay(batch_size=256)
-        agent.decay_epsilon(e)
-        print(agent.epsilon)
-        if score > max_score:
+        for i in range(10):
+            # replay experience and decay exploration factor
+            agent.replay(batch_size=64)
+            agent.decay_epsilon()
+        if score >= max_score:
             max_score = score
             print(f"Score in episode: {e} is: {score} --- eps: {agent.epsilon}")

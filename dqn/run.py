@@ -47,9 +47,10 @@ if __name__ == '__main__':
             agent.memory.append(Experience(state, action, reward, next_state, done))
             state = next_state
             score += 1
-        # replay experience and decay exploration factor
-        agent.replay(batch_size=64)
-        agent.decay_epsilon(e)
-        if score > max_score:
+        for i in range(10):
+            # replay experience and decay exploration factor
+            agent.replay(batch_size=64)
+            agent.decay_epsilon()
+        if score >= max_score:
             max_score = score
-            print(f"Score in episode: {e} is: {score} --- eps: {agent.epsilon }")
+            print(f"Score in episode: {e} is: {score} --- eps: {agent.epsilon}")

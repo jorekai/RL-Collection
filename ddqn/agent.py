@@ -16,10 +16,10 @@ class DDQNAgent:
                  memory: ReplayMemory,
                  net: NN,
                  target_net: NN,
-                 epsilon_init: float = 1,
+                 epsilon_init: float = 0.5,
                  gamma: float = 0.99,
                  epsilon_min: float = 0.01,
-                 epsilon_decay: float = 0.999):
+                 epsilon_decay: float = 0.99):
         """
         We initialize necessary objects and hyperparams
         :param env: gym environment
@@ -62,22 +62,25 @@ class DDQNAgent:
 
         for state, action, reward, next_state, done in experiences:
             target = self.net.predict(state)
-            # new to ddqn, we get the maximum state,action value from our target network
-            target[0][action] = reward if done else reward + self.gamma * np.max(
-                self.target_network.predict(next_state)[0])
+            target_next_state = self.net.predict(next_state)
+            target_next_state_offline = self.target_network.predict(next_state)
+            a = np.argmax(target_next_state)  # select the maximum action from Online network
+
+            # new to ddqn, we evaluate the action from our offline network
+            target[0][action] = reward if done else reward + self.gamma * target_next_state_offline[0][a]
             x.append(state[0])
             y.append(target[0])
-        self.net.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0)
+        self.net.fit(np.array(x), np.array(y), verbose=0)
         self.update_target_model()
 
-    def decay_epsilon(self, step: int):
+    def decay_epsilon(self):
         """
         Decay our exploration parameter logarithmic
         :param step: environment step as integer
         :return: void
         """
         if self.epsilon > self.epsilon_min:
-            self.epsilon = max(self.epsilon_min, min(self.epsilon, 1.0 - math.log10((step + 1) * self.epsilon_decay)))
+            self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
 
     def update_target_model(self):
         """

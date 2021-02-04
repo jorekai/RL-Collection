@@ -25,13 +25,10 @@ class NN:
         :return: initialized model
         """
         model = Sequential()
-        model.add(Dense(24, input_dim=4, activation='relu'))
-        model.add(Dense(48, activation='relu'))
-        model.add(Dense(96, activation='relu'))
-        model.add(Dense(48, activation='relu'))
-        model.add(Dense(24, activation='relu'))
-        model.add(Dense(2, activation='relu'))
-        model.compile(loss='mse', optimizer=adam(lr=self.alpha, decay=self.decay))
+        model.add(Dense(64, input_dim=4, activation='relu'))
+        model.add(Dense(64, activation='relu'))
+        model.add(Dense(2, activation='linear'))
+        model.compile(loss='mse', optimizer=adam(lr=self.alpha))
         return model
 
     def predict(self, *args, **kwargs):

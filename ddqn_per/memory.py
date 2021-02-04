@@ -25,7 +25,7 @@ class ReplayMemory:
         :param experience: Tuple(state, action, reward, next_state, done)
         :return: void
         """
-        heapq.heappush(self.memory, (-TDerror, next(self.tiebreaker), experience))
+        heapq.heappush(self.memory, (abs(TDerror), next(self.tiebreaker), experience))
         if len(self.memory) > self.maxlen:
             self.memory = self.memory[:-1]
         heapq.heapify(self.memory)
@@ -36,7 +36,7 @@ class ReplayMemory:
         :param batch_size: int > 0
         :return: List[Tuple(state, action, reward, next_state, done)]
         """
-        batch = heapq.nsmallest(batch_size, self.memory)
+        batch = heapq.nlargest(batch_size, self.memory)
         batch = [experience for _, _, experience in batch]  # return the S,A,R,S_,D and ignore the others
         self.memory = self.memory[batch_size:]
         return batch

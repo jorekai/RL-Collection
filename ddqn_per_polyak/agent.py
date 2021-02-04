@@ -68,14 +68,14 @@ class PolyakAgent:
         self.net.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0)
         self.update_target_model(self.tau)
 
-    def decay_epsilon(self, step: int):
+    def decay_epsilon(self):
         """
         Decay our exploration parameter logarithmic
         :param step: environment step as integer
         :return: void
         """
         if self.epsilon > self.epsilon_min:
-            self.epsilon = max(self.epsilon_min, min(self.epsilon, 1.0 - math.log10((step + 1) * self.epsilon_decay)))
+            self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min)
 
     def update_target_model(self, tau: float):
         """
