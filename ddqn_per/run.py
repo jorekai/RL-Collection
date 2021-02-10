@@ -54,8 +54,8 @@ if __name__ == '__main__':
             score += 1
         for i in range(10):
             # replay experience and decay exploration factor
-            if len(agent.memory.memory) >= 4:
-                agent.replay(batch_size=4)
+            if len(agent.memory.memory) >= 64:
+                agent.replay(batch_size=64)
                 agent.decay_epsilon()
         if score >= max_score:
             max_score = score

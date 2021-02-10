@@ -31,20 +31,20 @@ class NN:
 
     def init_model(self, input_shape: int, n_actions: int):
         inp = Input(shape=(input_shape,))
-        layer_shared1 = Dense(32, activation='relu', kernel_initializer='he_uniform')(inp)
+        layer_shared1 = Dense(64, activation='relu')(inp)
         layer_shared1 = BatchNormalization()(layer_shared1)
-        layer_shared2 = Dense(32, activation='relu', kernel_initializer='he_uniform')(layer_shared1)
+        layer_shared2 = Dense(64, activation='relu')(layer_shared1)
         layer_shared2 = BatchNormalization()(layer_shared2)
 
-        layer_v1 = Dense(32, activation='relu', kernel_initializer='he_uniform')(layer_shared2)
+        layer_v1 = Dense(64, activation='relu')(layer_shared2)
         layer_v1 = BatchNormalization()(layer_v1)
-        layer_a1 = Dense(32, activation='relu', kernel_initializer='he_uniform')(layer_shared2)
+        layer_a1 = Dense(64, activation='relu')(layer_shared2)
         layer_a1 = BatchNormalization()(layer_a1)
         # the value layer ouput is a scalar value
-        layer_v2 = Dense(1, activation='linear', kernel_initializer='he_uniform')(layer_v1)
+        layer_v2 = Dense(1, activation='linear')(layer_v1)
         # The advantage function subtracts the value of the state from the Q
         # function to obtain a relative measure of the importance of each action.
-        layer_a2 = Dense(n_actions, activation='linear', kernel_initializer='he_uniform')(layer_a1)
+        layer_a2 = Dense(n_actions, activation='linear')(layer_a1)
 
         # the q layer combines the two streams of value and advantage function
         # the lambda functional layer can perform lambda expressions on keras layers
@@ -54,7 +54,7 @@ class NN:
             [layer_v2, layer_a2])
 
         self.model = Model(inp, layer_q)
-        self.model.compile(optimizer=Adam(lr=self.alpha, decay=self.decay), loss='mse')
+        self.model.compile(optimizer=Adam(lr=self.alpha), loss='mse')
 
     def predict(self, *args, **kwargs):
         """

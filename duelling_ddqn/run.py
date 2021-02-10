@@ -24,13 +24,13 @@ if __name__ == '__main__':
     max_score = 0
 
     n_episodes = 5000
-    max_env_steps = 1000
+    max_env_steps = 250
 
     env = gym.make('CartPole-v0')
     agent = DuellingDDQNAgent(env=env,
                               net=NN(env=env),
                               target_net=NN(env=env),
-                              memory=ReplayMemory(size=100000))
+                              memory=ReplayMemory(size=50000))
 
     if max_env_steps is not None:
         env._max_episode_steps = max_env_steps
@@ -49,7 +49,7 @@ if __name__ == '__main__':
             agent.memory.append(Experience(state, action, reward, next_state, done))
             state = next_state
             score += 1
-        for i in range(10):
+        for i in range(2):
             # replay experience and decay exploration factor
             agent.replay(batch_size=64)
             agent.decay_epsilon()

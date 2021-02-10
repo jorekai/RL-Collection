@@ -20,7 +20,7 @@ class DuellingDDQNAgent:
                  epsilon_init: float = 1,
                  gamma: float = 0.99,
                  epsilon_min: float = 0.01,
-                 epsilon_decay: float = 0.2):
+                 epsilon_decay: float = 0.99):
         """
         The initialization method of our agent
         :param env: gym environment
@@ -59,8 +59,12 @@ class DuellingDDQNAgent:
 
         for state, action, reward, next_state, done in experiences:
             target = self.net.predict(state)
-            # new to ddqn, we get the maximum state,action value from our target network
-            target[0][action] = reward if done else reward + self.gamma * np.max(self.target_network.predict(next_state)[0])
+            target_next_state = self.net.predict(next_state)
+            target_next_state_offline = self.target_network.predict(next_state)
+            a = np.argmax(target_next_state)  # select the maximum action from Online network
+
+            # new to ddqn, we evaluate the action from our offline network
+            target[0][action] = reward if done else reward + self.gamma * target_next_state_offline[0][a]
             x.append(state[0])
             y.append(target[0])
         self.net.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0)
